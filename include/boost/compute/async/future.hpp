@@ -71,6 +71,16 @@ public:
         return m_event != 0;
     }
 
+    /// Returns \c true if the future is ready
+    /// (i.e. underlying event is completed).
+    bool is_ready()
+    {
+        if(!valid()){
+            throw future_error("Attempt to get readiness of an empty future.");
+        }
+        return m_event.status() == CL_COMPLETE;
+    }
+
     /// Blocks until the computation is complete.
     void wait() const
     {
@@ -159,6 +169,14 @@ public:
     bool valid() const
     {
         return m_event != 0;
+    }
+
+    bool is_ready()
+    {
+        if(!valid()){
+            throw future_error("Attempt to get readiness of an empty future.");
+        }
+        return m_event.status() == CL_COMPLETE;
     }
 
     void wait() const

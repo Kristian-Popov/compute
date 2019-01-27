@@ -125,8 +125,10 @@ BOOST_AUTO_TEST_CASE(empty_copy)
 
     bc::future<bc::vector<int>::iterator> future =
         bc::copy_async(c.begin(), c.end(), a.begin(), queue);
-    if(future.valid())
+    if(future.valid()){
         future.wait();
+        BOOST_CHECK(future.is_ready());
+    }
     CHECK_RANGE_EQUAL(int, 4, a, (1, 2, 5, 6));
 }
 
@@ -232,6 +234,7 @@ BOOST_AUTO_TEST_CASE(copy_int_async)
 
     // wait for copy to complete
     host_to_device_future.wait();
+    BOOST_CHECK(host_to_device_future.is_ready());
 
     // check results
     CHECK_RANGE_EQUAL(int, 8, device_data, (1, 2, 3, 4, 5, 6, 7, 8));
@@ -246,6 +249,7 @@ BOOST_AUTO_TEST_CASE(copy_int_async)
 
     // wait for copy to complete
     device_to_host_future.wait();
+    BOOST_CHECK(device_to_host_future.is_ready());
 
     // check results
     BOOST_CHECK_EQUAL(host_data[0], int(1));
@@ -307,6 +311,7 @@ BOOST_AUTO_TEST_CASE(check_copy_type)
         future.get_event().get_command_type() == CL_COMMAND_WRITE_BUFFER
     );
     future.wait();
+    BOOST_CHECK(future.is_ready());
     CHECK_RANGE_EQUAL(int, 8, a, (1, 2, 3, 4, 5, 6, 7, 8));
 
     // copy on the device and ensure clEnqueueCopyBuffer() is used
@@ -316,6 +321,7 @@ BOOST_AUTO_TEST_CASE(check_copy_type)
         future.get_event().get_command_type() == CL_COMMAND_COPY_BUFFER
     );
     future.wait();
+    BOOST_CHECK(future.is_ready());
     CHECK_RANGE_EQUAL(int, 8, b, (1, 2, 3, 4, 5, 6, 7, 8));
 
     // copy between vectors of different types on the device and ensure
@@ -326,6 +332,7 @@ BOOST_AUTO_TEST_CASE(check_copy_type)
         future.get_event().get_command_type() == CL_COMMAND_NDRANGE_KERNEL
     );
     future.wait();
+    BOOST_CHECK(future.is_ready());
     CHECK_RANGE_EQUAL(short, 8, c, (1, 2, 3, 4, 5, 6, 7, 8));
 
     // copy from device to host and ensure clEnqueueReadBuffer() is used
@@ -334,6 +341,7 @@ BOOST_AUTO_TEST_CASE(check_copy_type)
         future.get_event().get_command_type() == CL_COMMAND_READ_BUFFER
     );
     future.wait();
+    BOOST_CHECK(future.is_ready());
     CHECK_HOST_RANGE_EQUAL(int, 8, data, (1, 2, 3, 4, 5, 6, 7, 8));
 }
 
@@ -378,11 +386,13 @@ BOOST_AUTO_TEST_CASE(copy_async_svm_ptr)
     boost::compute::future<void> future =
         compute::copy_async(data, data + 4, ptr, queue);
     future.wait();
+    BOOST_CHECK(future.is_ready());
 
     int_ output[] = { 0, 0, 0, 0 };
     future =
         compute::copy_async(ptr, ptr + 4, output, queue);
     future.wait();
+    BOOST_CHECK(future.is_ready());
     CHECK_HOST_RANGE_EQUAL(int_, 4, output, (1, 3, 2, 4));
 
     compute::svm_free(context, ptr);

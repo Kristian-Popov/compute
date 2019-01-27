@@ -23,6 +23,7 @@ BOOST_AUTO_TEST_CASE(empty_void_future)
     boost::compute::future<void> future;
     BOOST_CHECK(!future.valid());
     BOOST_CHECK_THROW(future.wait(), boost::compute::future_error);
+    BOOST_CHECK_THROW(future.is_ready(), boost::compute::future_error);
 }
 
 BOOST_AUTO_TEST_CASE(empty_int_future)
@@ -30,6 +31,7 @@ BOOST_AUTO_TEST_CASE(empty_int_future)
     boost::compute::future<int> future;
     BOOST_CHECK(!future.valid());
     BOOST_CHECK_THROW(future.wait(), boost::compute::future_error);
+    BOOST_CHECK_THROW(future.is_ready(), boost::compute::future_error);
 }
 
 #ifdef BOOST_COMPUTE_CL_VERSION_1_1
@@ -40,9 +42,12 @@ BOOST_AUTO_TEST_CASE(void_future)
     boost::compute::user_event event(context);
     boost::compute::future<void> future(event);
     BOOST_CHECK(future.valid());
+    BOOST_CHECK(!future.is_ready());
 
     event.set_status(CL_COMPLETE);
     BOOST_CHECK_NO_THROW(future.wait());
+
+    BOOST_CHECK(future.is_ready());
 }
 
 BOOST_AUTO_TEST_CASE(int_future)
@@ -52,9 +57,12 @@ BOOST_AUTO_TEST_CASE(int_future)
     boost::compute::user_event event(context);
     boost::compute::future<int> future(1, event);
     BOOST_CHECK(future.valid());
+    BOOST_CHECK(!future.is_ready());
 
     event.set_status(CL_COMPLETE);
     BOOST_CHECK_NO_THROW(future.wait());
+
+    BOOST_CHECK(future.is_ready());
 }
 #endif // BOOST_COMPUTE_CL_VERSION_1_1
 
