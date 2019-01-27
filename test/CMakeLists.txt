@@ -159,6 +159,7 @@ add_compute_test("algorithm.lexicographical_compare" test_lexicographical_compar
 add_compute_test("allocator.buffer_allocator" test_buffer_allocator.cpp)
 add_compute_test("allocator.pinned_allocator" test_pinned_allocator.cpp)
 
+add_compute_test("async.future" test_async_future.cpp)
 add_compute_test("async.wait" test_async_wait.cpp)
 add_compute_test("async.wait_guard" test_async_wait_guard.cpp)
 

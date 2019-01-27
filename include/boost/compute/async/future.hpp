@@ -12,6 +12,7 @@
 #define BOOST_COMPUTE_ASYNC_FUTURE_HPP
 
 #include <boost/compute/event.hpp>
+#include <boost/compute/exception/future_error.hpp>
 
 namespace boost {
 namespace compute {
@@ -73,6 +74,9 @@ public:
     /// Blocks until the computation is complete.
     void wait() const
     {
+        if(!valid()){
+            throw future_error("Attempt to wait on an empty future.");
+        }
         m_event.wait();
     }
 
@@ -92,6 +96,9 @@ public:
     template<class Function>
     future& then(Function callback)
     {
+        if(!valid()){
+            throw future_error("Attempt to call then() of an empty future.");
+        }
         m_event.set_callback(callback);
         return *this;
     }
@@ -156,6 +163,9 @@ public:
 
     void wait() const
     {
+        if(!valid()){
+            throw future_error("Attempt to wait on an empty future.");
+        }
         m_event.wait();
     }
 
@@ -174,6 +184,9 @@ public:
     template<class Function>
     future<void> &then(Function callback)
     {
+        if(!valid()){
+            throw future_error("Attempt to call then() of an empty future.");
+        }
         m_event.set_callback(callback);
         return *this;
     }
